@@ -1,0 +1,9 @@
+{
+  "short_name": "SD Film",
+  "name": "SD Film - Film Kiralama Sistemi",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
