@@ -212,7 +212,7 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ## 📞 İletişim
 
-Proje hakkında sorularınız için issue açabilirsiniz.
+Proje hakkında sorularınız için issue açabilirsiniz
 
 ---
 
