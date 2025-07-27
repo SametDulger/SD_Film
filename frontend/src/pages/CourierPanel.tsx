@@ -33,12 +33,14 @@ const CourierPanel: React.FC = () => {
   const [assignedOrders, setAssignedOrders] = useState<Order[]>([]);
   const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
 
   const config = {
     headers: { Authorization: `Bearer ${token}` }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -46,7 +48,7 @@ const CourierPanel: React.FC = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5028/api/orders/courier/${user?.id}`, config);
+      const response = await axios.get(`http://localhost:5000/api/orders/courier/${user?.id}`, config);
       const allOrders = response.data.data || [];
       setAssignedOrders(allOrders.filter((order: Order) => 
         order.status === 'Assigned' || order.status === 'InTransit'
@@ -63,7 +65,7 @@ const CourierPanel: React.FC = () => {
 
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
-      await axios.put(`http://localhost:5028/api/orders/${orderId}/status`, status, config);
+      await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, status, config);
       fetchOrders();
     } catch (error) {
       setError('Durum güncellenirken bir hata oluştu');

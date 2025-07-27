@@ -1,75 +1,276 @@
-# --------------------
-# Node.js / React / Frontend
-# --------------------
+# SD Film Project - .gitignore
+
+# Frontend (React)
 node_modules/
-build/
-dist/
-.env
-.env.*
-coverage/
-.nyc_output/
-.cache/
-.parcel-cache/
-.DS_Store
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-logs/
-*.log
-tmp/
-temp/
+lerna-debug.log*
+.pnpm-debug.log*
+frontend/build/
+frontend/dist/
+frontend/out/
+frontend/.next/
+frontend/.nuxt/
+frontend/.output/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-# Sub-repositories (only ignore .git folders, not entire directories)
-**/.git/
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+.env.*.local
 
-# --------------------
-# .NET / Backend
-# --------------------
-[Bb]in/
-[Oo]bj/
-.vs/
-publish/
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
+.jest/
+cypress/videos/
+cypress/screenshots/
+playwright-report/
+test-results/
+*.test.js.snap
+*.test.ts.snap
+*.spec.js.snap
+*.spec.ts.snap
+
+# Package Managers
+.npm
+.eslintcache
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Backend (.NET)
+Backend/**/bin/
+Backend/**/obj/
+Backend/**/out/
+Backend/**/publish/
+Backend/**/Debug/
+Backend/**/Release/
+Backend/**/x64/
+Backend/**/x86/
+Backend/**/appsettings.Development.json
+Backend/**/appsettings.Production.json
+Backend/**/appsettings.Staging.json
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-*.coverage
-*.coveragexml
-*.testsettings
-*.vsmdi
-*.psess
-*.vsp
-*.vspx
-*.sap
-*.trx
-*.tss
+*.userprefs
+*.dll
+*.exe
+*.pdb
+*.cache
+*.tmp
+*.temp
+*.log
+*.tlog
+*.lastbuildstate
+*.idb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
 
-# Database & config
-*.mdf
-*.ldf
-*.ndf
+# Entity Framework
+Backend/**/Migrations/
+*.Designer.cs
+*.Designer.vb
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio
+.vs/
+*.vscode/
+*.sln.iml
+*.csproj.user
+*.vbproj.user
+
+# Database
 *.db
 *.sqlite
 *.sqlite3
-appsettings.Development.json
-appsettings.Production.json
-**/Properties/launchSettings.json
+*.mdb
+*.accdb
+*.db-shm
+*.db-wal
+Backend/**/SDFilm.db
+Backend/**/SDFilm.db-shm
+Backend/**/SDFilm.db-wal
+*.db-journal
+*.sqlite-journal
 
-# Backup & misc
-*.bak
-*.backup
-*.dbmdl
-*.dbproj.schemaview
-*.jfm
+# SSL & Security
 *.pfx
-*.publishsettings
-orleans.codegen.cs
+*.p12
+*.key
+*.crt
+*.cer
+*.der
+*.p7b
+*.p7c
+*.pem
+*.p8
+*.p10
+*.pwd
+*.pub
+*.asc
+*.gpg
+*.keystore
+*.jks
 
-# IDE & platform
+# IDE & Editors
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+.metadata/
+.factorypath
+.sts4-cache/
+
+# Operating System
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs
+logs/
+Backend/**/Logs/
+Backend/**/logs/
+
+# Cache & Temporary
+.cache/
+.parcel-cache/
+dist/
+build/
+out/
+
+# Backup Files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+
+# Configuration (Sensitive)
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.Development.json
+secrets.json
+*.config.user
+*.config.production
+*.config.staging
+
+# Performance & Profiling
+*.prof
+*.trace
+*.dump
+*.heapdump
+*.hprof
+
+# Docker
+.dockerignore
+Dockerfile.prod
+docker-compose.override.yml
+.docker/
+
+# CI/CD
+.azure/
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+.teamcity/
+.vsts/
+*.deployment
+*.pubxml
+*.pubxml.user
+*.publishproj
+
+# Documentation
+docs/_build/
+docs/build/
+site/
+_site/
+
+# Local Development
+.local/
+local/
+dev/
+development/
+
+# Media Files
+uploads/
+media/
+images/
+videos/
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+
+# Keep Important Files
+!appsettings.json
+!appsettings.Example.json
+!README.md
+!LICENSE
+!.gitignore
+!package.json
+!package-lock.json
+!yarn.lock
+!pnpm-lock.yaml

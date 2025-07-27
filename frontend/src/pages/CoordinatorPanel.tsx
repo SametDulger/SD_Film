@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../AuthContext';
 
@@ -51,35 +51,35 @@ const CoordinatorPanel: React.FC = () => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  useEffect(() => {
-    fetchOrders();
-    fetchCouriers();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/orders', config);
+      const response = await axios.get('http://localhost:5000/api/orders', config);
       setOrders(response.data.data || []);
     } catch (error) {
       setError('Siparişler yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
-  const fetchCouriers = async () => {
+  const fetchCouriers = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5028/api/users/role/Courier', config);
+      const response = await axios.get('http://localhost:5000/api/users/role/Courier', config);
       setCouriers(response.data.data || []);
     } catch (error) {
       setError('Kuryeler yüklenirken bir hata oluştu');
     }
-  };
+  }, [config]);
+
+  useEffect(() => {
+    fetchOrders();
+    fetchCouriers();
+  }, [fetchOrders, fetchCouriers]);
 
   const handleAssignCourier = async (orderId: number, courierId: number) => {
     try {
-      await axios.post(`http://localhost:5028/api/orders/${orderId}/assign-courier/${courierId}`, {}, config);
+      await axios.post(`http://localhost:5000/api/orders/${orderId}/assign-courier/${courierId}`, {}, config);
       fetchOrders();
     } catch (error) {
       setError('Kurye ataması yapılırken bir hata oluştu');
@@ -88,7 +88,7 @@ const CoordinatorPanel: React.FC = () => {
 
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
-      await axios.put(`http://localhost:5028/api/orders/${orderId}/status`, status, config);
+      await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, status, config);
       fetchOrders();
     } catch (error) {
       setError('Durum güncellenirken bir hata oluştu');

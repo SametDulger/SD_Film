@@ -84,6 +84,7 @@ const CustomerPanel: React.FC = () => {
     onCancel: () => {}
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchFilms();
     fetchOrders();
@@ -96,6 +97,7 @@ const CustomerPanel: React.FC = () => {
     setCategories(uniqueCategories);
   }, [films]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeTab === 'list') {
       fetchUserFilmList();
@@ -112,7 +114,7 @@ const CustomerPanel: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      const response = await axios.get('http://localhost:5028/api/films', config);
+      const response = await axios.get('http://localhost:5000/api/films', config);
       setFilms(response.data.data || []);
     } catch (error) {
       setModalAlert({
@@ -133,7 +135,7 @@ const CustomerPanel: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      const response = await axios.get(`http://localhost:5028/api/orders/user/${user?.id}`, config);
+      const response = await axios.get(`http://localhost:5000/api/orders/user/${user?.id}`, config);
       setOrders(response.data.data || []);
     } catch (error) {
       setModalAlert({
@@ -152,7 +154,7 @@ const CustomerPanel: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      const response = await axios.get('http://localhost:5028/api/userfilmlists/my-list', config);
+      const response = await axios.get('http://localhost:5000/api/userfilmlists/my-list', config);
       setUserFilmList(response.data.data || []);
     } catch (error) {
       setModalAlert({
@@ -171,7 +173,7 @@ const CustomerPanel: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      const response = await axios.get('http://localhost:5028/api/cart', config);
+      const response = await axios.get('http://localhost:5000/api/cart', config);
       setCart(response.data.data || { totalItems: 0, totalAmount: 0, items: [] });
     } catch (error) {
       setModalAlert({
@@ -195,7 +197,8 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      const response = await axios.post('http://localhost:5028/api/cart', {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await axios.post('http://localhost:5000/api/cart', {
         filmId: filmId,
         quantity: 1
       }, config);
@@ -222,7 +225,7 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      await axios.put(`http://localhost:5028/api/cart/${cartItemId}`, {
+      await axios.put(`http://localhost:5000/api/cart/${cartItemId}`, {
         quantity: quantity
       }, config);
       fetchCart();
@@ -248,7 +251,7 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      await axios.delete(`http://localhost:5028/api/cart/${cartItemId}`, config);
+      await axios.delete(`http://localhost:5000/api/cart/${cartItemId}`, config);
       fetchCart();
     } catch (error) {
       setModalAlert({
@@ -278,7 +281,7 @@ const CustomerPanel: React.FC = () => {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await axios.delete('http://localhost:5028/api/cart/clear', config);
+          await axios.delete('http://localhost:5000/api/cart/clear', config);
           fetchCart();
           setModalAlert({ ...modalAlert, isOpen: false });
         } catch (error) {
@@ -310,7 +313,7 @@ const CustomerPanel: React.FC = () => {
     }
 
     try {
-      await axios.post('http://localhost:5028/api/cart/checkout', {
+      await axios.post('http://localhost:5000/api/cart/checkout', {
         deliveryAddress: deliveryAddress
       }, config);
       setShowCheckoutModal(false);
@@ -339,7 +342,8 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      const response = await axios.post('http://localhost:5028/api/userfilmlists', {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await axios.post('http://localhost:5000/api/userfilmlists', {
         filmId: filmId
       }, config);
       fetchUserFilmList();
@@ -365,7 +369,7 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      await axios.delete(`http://localhost:5028/api/userfilmlists/${listItemId}`, config);
+      await axios.delete(`http://localhost:5000/api/userfilmlists/${listItemId}`, config);
       fetchUserFilmList();
     } catch (error) {
       setModalAlert({
@@ -389,7 +393,7 @@ const CustomerPanel: React.FC = () => {
     };
     
     try {
-      await axios.put(`http://localhost:5028/api/userfilmlists/${listItemId}`, {
+      await axios.put(`http://localhost:5000/api/userfilmlists/${listItemId}`, {
         isWatched: isWatched
       }, config);
       fetchUserFilmList();

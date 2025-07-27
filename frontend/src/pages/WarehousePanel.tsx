@@ -41,8 +41,11 @@ const WarehousePanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showAddStockModal, setShowAddStockModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showRemoveStockModal, setShowRemoveStockModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showAddFilmModal, setShowAddFilmModal] = useState(false);
   const [selectedFilmId, setSelectedFilmId] = useState(0);
   const [addStockQuantity, setAddStockQuantity] = useState(1);
@@ -72,6 +75,7 @@ const WarehousePanel: React.FC = () => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchFilms();
     fetchCategories();
@@ -81,7 +85,7 @@ const WarehousePanel: React.FC = () => {
   const fetchFilms = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/films', config);
+      const response = await axios.get('http://localhost:5000/api/films', config);
       setFilms(response.data.data || []);
     } catch (error) {
       // Error handling
@@ -92,7 +96,7 @@ const WarehousePanel: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:5028/api/categories', config);
+      const response = await axios.get('http://localhost:5000/api/categories', config);
       setCategories(response.data.data || []);
     } catch (error) {
       // Error handling
@@ -101,13 +105,14 @@ const WarehousePanel: React.FC = () => {
 
   const fetchStockMovements = async () => {
     try {
-      const response = await axios.get('http://localhost:5028/api/stock-movements', config);
+      const response = await axios.get('http://localhost:5000/api/stock-movements', config);
       setStockMovements(response.data.data || []);
     } catch (error) {
       // Error handling
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleAddStock = async () => {
     if (addStockQuantity <= 0) {
       setModalAlert({
@@ -122,7 +127,7 @@ const WarehousePanel: React.FC = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5028/api/films/${selectedFilmId}/add-stock`, {
+      await axios.post(`http://localhost:5000/api/films/${selectedFilmId}/add-stock`, {
         quantity: addStockQuantity
       }, config);
       
@@ -151,6 +156,7 @@ const WarehousePanel: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleRemoveStock = async () => {
     if (removeStockQuantity <= 0) {
       setModalAlert({
@@ -165,7 +171,7 @@ const WarehousePanel: React.FC = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5028/api/films/${selectedFilmId}/remove-stock`, {
+      await axios.post(`http://localhost:5000/api/films/${selectedFilmId}/remove-stock`, {
         quantity: removeStockQuantity
       }, config);
       
@@ -196,7 +202,7 @@ const WarehousePanel: React.FC = () => {
 
   const handleAddFilm = async () => {
     try {
-      await axios.post('http://localhost:5028/api/films', newFilm, config);
+      await axios.post('http://localhost:5000/api/films', newFilm, config);
       setModalAlert({
         isOpen: true,
         title: 'Başarılı',
@@ -363,6 +369,7 @@ const WarehousePanel: React.FC = () => {
       <form onSubmit={(e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const filmData = {
           title: formData.get('title') as string,
           director: formData.get('director') as string,

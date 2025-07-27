@@ -25,11 +25,13 @@ const Films: React.FC = () => {
   const categoryId = searchParams.get('category');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchFilms();
   }, [categoryId]);
 
   // Debounced search function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     (() => {
       let timeoutId: NodeJS.Timeout;
@@ -43,6 +45,7 @@ const Films: React.FC = () => {
     []
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (searchTerm.trim()) {
       debouncedSearch(searchTerm);
@@ -54,10 +57,10 @@ const Films: React.FC = () => {
   const fetchFilms = async () => {
     try {
       setLoading(true);
-      let url = 'http://localhost:5028/api/films';
+      let url = 'http://localhost:5000/api/films';
       
       if (categoryId) {
-        url = `http://localhost:5028/api/films/category/${categoryId}`;
+        url = `http://localhost:5000/api/films/category/${categoryId}`;
       }
       
       const response = await axios.get(url);
@@ -77,7 +80,7 @@ const Films: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5028/api/films/search?q=${encodeURIComponent(term)}`);
+      const response = await axios.get(`http://localhost:5000/api/films/search?q=${encodeURIComponent(term)}`);
       setFilms(response.data.data || []);
     } catch (err) {
       setError('Arama yapılırken bir hata oluştu');

@@ -35,10 +35,10 @@ const Register: React.FC = () => {
     setError(null);
     try {
       const { confirmPassword, ...registerData } = formData;
-      const response = await axios.post('http://localhost:5028/api/users', registerData);
+      const response = await axios.post('http://localhost:5000/api/users', registerData);
       if (response.data.success) {
         // Kayıt sonrası otomatik login
-        const loginResponse = await axios.post('http://localhost:5028/api/users/login', {
+        const loginResponse = await axios.post('http://localhost:5000/api/users/login', {
           email: formData.email,
           password: formData.password
         });

@@ -65,7 +65,7 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpGet("test")]
-        public async Task<IActionResult> TestAuth()
+        public IActionResult TestAuth()
         {
             var userId = GetCurrentUserId();
             return Ok(new { userId = userId, message = "Authentication working" });
