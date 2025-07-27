@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useAuth } from '../AuthContext';
 import ModalAlert from '../components/ModalAlert';
 
@@ -60,8 +61,8 @@ const FilmEntryPanel: React.FC = () => {
     try {
       setLoading(true);
       const [filmsResponse, categoriesResponse] = await Promise.all([
-        axios.get('http://localhost:5028/api/films'),
-        axios.get('http://localhost:5028/api/categories')
+        axios.get('http://localhost:5000/api/films'),
+        axios.get('http://localhost:5000/api/categories')
       ]);
       
       setFilms(filmsResponse.data.data || []);
@@ -86,7 +87,7 @@ const FilmEntryPanel: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5028/api/films', newFilm);
+      const response = await axios.post('http://localhost:5000/api/films', newFilm);
       if (response.data.success) {
         setNewFilm({
           title: '',
@@ -139,7 +140,7 @@ const FilmEntryPanel: React.FC = () => {
       return;
     }
     try {
-      await axios.put(`http://localhost:5028/api/films/${filmId}/stock`, { newStockCount: newStock });
+      await axios.put(`http://localhost:5000/api/films/${filmId}/stock`, { newStockCount: newStock });
       fetchData();
       setModalAlert({
         isOpen: true,

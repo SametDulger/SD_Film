@@ -7,19 +7,33 @@ using SDFilm.Business.Services;
 using SDFilm.Business.Mapping;
 using SDFilm.DataAccess;
 using System.Text;
+using Serilog;
+using FluentValidation;
+using SDFilm.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Sade Serilog yapılandırması
+builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console());
 
+// Add services to the container.
+builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SD Film API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { 
+        Title = "SD Film API", 
+        Version = "v1",
+        Description = "SD Film kiralama sistemi API'si",
+        Contact = new OpenApiContact
+        {
+            Name = "SD Film Team",
+            Email = "info@sdfilm.com"
+        }
+    });
     
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -46,11 +60,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Database configuration
 builder.Services.AddDbContext<SDFilmDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// AutoMapper configuration
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// Service registrations
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFilmService, FilmService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -66,7 +83,12 @@ builder.Services.AddScoped<ICartService, CartService>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["Key"];
 if (string.IsNullOrEmpty(secretKey))
-    throw new InvalidOperationException("JWT secret key is not set in configuration.");
+{
+    // In production, this should be set via environment variable
+    secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? 
+                "SuperSecretKeyForJwtToken123!@#$%^&*()_+QWERTYUIOP";
+}
+
 var key = Encoding.UTF8.GetBytes(secretKey);
 builder.Services.AddAuthentication(options =>
 {
@@ -115,15 +137,24 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SD Film API V1");
+        c.RoutePrefix = string.Empty; // Serve Swagger UI at root
+    });
 }
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+
+// Global exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Ensure database is created
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SDFilmDbContext>();

@@ -18,17 +18,22 @@ namespace SDFilm.Business.Services
             _mapper = mapper;
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> GetAllAsync()
+        public async Task<ApiResponse<List<FilmDto>>> GetAllAsync(int page = 1, int pageSize = 10)
         {
             try
             {
+                var totalCount = await _context.Films.CountAsync();
                 var films = await _context.Films
                     .Include(f => f.Category)
                     .OrderByDescending(f => f.CreatedDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
@@ -46,8 +51,6 @@ namespace SDFilm.Business.Services
 
                 if (film == null)
                     return ApiResponse<FilmDto>.ErrorResult("Film bulunamadı");
-                if (film.Category == null)
-                    return ApiResponse<FilmDto>.ErrorResult("Film kategorisi bulunamadı");
 
                 var filmDto = _mapper.Map<FilmDto>(film);
                 return ApiResponse<FilmDto>.SuccessResult(filmDto);
@@ -66,8 +69,8 @@ namespace SDFilm.Business.Services
                     .Include(f => f.Category)
                     .FirstOrDefaultAsync(f => f.Barcode == barcode);
 
-                if (film == null || film.Category == null)
-                    return ApiResponse<FilmDto>.ErrorResult("Film veya kategorisi bulunamadı");
+                if (film == null)
+                    return ApiResponse<FilmDto>.ErrorResult("Film bulunamadı");
 
                 var filmDto = _mapper.Map<FilmDto>(film);
                 return ApiResponse<FilmDto>.SuccessResult(filmDto);
@@ -78,18 +81,23 @@ namespace SDFilm.Business.Services
             }
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> GetByCategoryAsync(int categoryId)
+        public async Task<ApiResponse<List<FilmDto>>> GetByCategoryAsync(int categoryId, int page = 1, int pageSize = 10)
         {
             try
             {
+                var totalCount = await _context.Films.CountAsync(f => f.CategoryId == categoryId);
                 var films = await _context.Films
                     .Include(f => f.Category)
                     .Where(f => f.CategoryId == categoryId)
                     .OrderByDescending(f => f.CreatedDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
@@ -97,21 +105,28 @@ namespace SDFilm.Business.Services
             }
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> SearchAsync(string searchTerm)
+        public async Task<ApiResponse<List<FilmDto>>> SearchAsync(string searchTerm, int page = 1, int pageSize = 10)
         {
             try
             {
-                var films = await _context.Films
+                var query = _context.Films
                     .Include(f => f.Category)
                     .Where(f => f.Title.Contains(searchTerm) || 
                                f.Description.Contains(searchTerm) || 
                                f.Director.Contains(searchTerm) || 
-                               f.Cast.Contains(searchTerm))
+                               f.Cast.Contains(searchTerm));
+
+                var totalCount = await query.CountAsync();
+                var films = await query
                     .OrderByDescending(f => f.CreatedDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
@@ -119,59 +134,81 @@ namespace SDFilm.Business.Services
             }
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> GetNewReleasesAsync()
+        public async Task<ApiResponse<List<FilmDto>>> GetNewReleasesAsync(int page = 1, int pageSize = 10)
         {
             try
             {
-                var films = await _context.Films
+                var query = _context.Films
                     .Include(f => f.Category)
-                    .Where(f => f.IsNewRelease && f.IsActive)
+                    .Where(f => f.IsNewRelease && f.IsActive);
+
+                var totalCount = await query.CountAsync();
+                var films = await query
+                    .OrderByDescending(f => f.CreatedDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
-                return ApiResponse<List<FilmDto>>.ErrorResult("Yeni çıkanlar getirilirken hata oluştu", new List<string> { ex.Message });
+                return ApiResponse<List<FilmDto>>.ErrorResult($"Yeni çıkanlar getirilirken hata oluştu: {ex.Message}");
             }
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> GetEditorChoicesAsync()
+        public async Task<ApiResponse<List<FilmDto>>> GetEditorChoicesAsync(int page = 1, int pageSize = 10)
         {
             try
             {
-                var films = await _context.Films
+                var query = _context.Films
                     .Include(f => f.Category)
-                    .Where(f => f.IsEditorChoice && f.IsActive)
+                    .Where(f => f.IsEditorChoice && f.IsActive);
+
+                var totalCount = await query.CountAsync();
+                var films = await query
+                    .OrderByDescending(f => f.CreatedDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
-                return ApiResponse<List<FilmDto>>.ErrorResult("Editör seçimleri getirilirken hata oluştu", new List<string> { ex.Message });
+                return ApiResponse<List<FilmDto>>.ErrorResult($"Editör seçimleri getirilirken hata oluştu: {ex.Message}");
             }
         }
 
-        public async Task<ApiResponse<List<FilmDto>>> GetMostRentedAsync()
+        public async Task<ApiResponse<List<FilmDto>>> GetMostRentedAsync(int page = 1, int pageSize = 10)
         {
             try
             {
-                var films = await _context.Films
+                var query = _context.Films
                     .Include(f => f.Category)
                     .Where(f => f.IsActive)
-                    .OrderByDescending(f => f.RentalCount)
-                    .Take(10)
+                    .OrderByDescending(f => f.RentalCount);
+
+                var totalCount = await query.CountAsync();
+                var films = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var filmDtos = _mapper.Map<List<FilmDto>>(films);
-                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos);
+                var pagination = new PaginationInfo(page, pageSize, totalCount);
+                
+                return ApiResponse<List<FilmDto>>.SuccessResult(filmDtos, pagination);
             }
             catch (Exception ex)
             {
-                return ApiResponse<List<FilmDto>>.ErrorResult("En çok kiralananlar getirilirken hata oluştu", new List<string> { ex.Message });
+                return ApiResponse<List<FilmDto>>.ErrorResult($"En çok kiralananlar getirilirken hata oluştu: {ex.Message}");
             }
         }
 
@@ -181,6 +218,7 @@ namespace SDFilm.Business.Services
             {
                 var film = _mapper.Map<Film>(createFilmDto);
                 film.CreatedDate = DateTime.Now;
+                film.IsActive = true;
 
                 if (string.IsNullOrEmpty(film.Barcode))
                 {
@@ -229,7 +267,10 @@ namespace SDFilm.Business.Services
                 if (film == null)
                     return ApiResponse<bool>.ErrorResult("Film bulunamadı");
 
-                _context.Films.Remove(film);
+                // Soft delete - set IsActive to false instead of removing
+                film.IsActive = false;
+                film.UpdatedDate = DateTime.Now;
+
                 await _context.SaveChangesAsync();
 
                 return ApiResponse<bool>.SuccessResult(true);
@@ -247,6 +288,9 @@ namespace SDFilm.Business.Services
                 var film = await _context.Films.FindAsync(id);
                 if (film == null)
                     return ApiResponse<bool>.ErrorResult("Film bulunamadı");
+
+                if (newStockCount < 0)
+                    return ApiResponse<bool>.ErrorResult("Stok miktarı negatif olamaz");
 
                 film.StockCount = newStockCount;
                 film.UpdatedDate = DateTime.Now;

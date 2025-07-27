@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../AuthContext';
 import ModalAlert from '../components/ModalAlert';
@@ -130,70 +130,71 @@ const AdminPanel: React.FC = () => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  useEffect(() => {
-    if (activeTab === 'users') fetchUsers();
-    if (activeTab === 'films') fetchFilms();
-    if (activeTab === 'categories') fetchCategories();
-    if (activeTab === 'packages') fetchPackages();
-  }, [activeTab]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Fetch fonksiyonları
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/users', config);
+      const response = await axios.get('http://localhost:5000/api/users', config);
       setUsers(response.data.data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
-  const fetchFilms = async () => {
+  const fetchFilms = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/films', config);
+      const response = await axios.get('http://localhost:5000/api/films', config);
       setFilms(response.data.data || []);
     } catch (error) {
       console.error('Error fetching films:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/categories', config);
+      const response = await axios.get('http://localhost:5000/api/categories', config);
       setCategories(response.data.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
-  const fetchPackages = async () => {
+  const fetchPackages = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/packages', config);
+      const response = await axios.get('http://localhost:5000/api/packages', config);
       setPackages(response.data.data || []);
     } catch (error) {
       console.error('Error fetching packages:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
+
+  useEffect(() => {
+    if (activeTab === 'users') fetchUsers();
+    if (activeTab === 'films') fetchFilms();
+    if (activeTab === 'categories') fetchCategories();
+    if (activeTab === 'packages') fetchPackages();
+  }, [activeTab, fetchUsers, fetchFilms, fetchCategories, fetchPackages]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+
 
   // CRUD Operations
   const handleCreateUser = async () => {
     try {
-      await axios.post('http://localhost:5028/api/users', userForm, config);
+      await axios.post('http://localhost:5000/api/users', userForm, config);
       setShowUserModal(false);
       resetUserForm();
       fetchUsers();
@@ -205,7 +206,7 @@ const AdminPanel: React.FC = () => {
   const handleUpdateUser = async () => {
     if (!editingUser) return;
     try {
-      await axios.put(`http://localhost:5028/api/users/${editingUser.id}`, userForm, config);
+      await axios.put(`http://localhost:5000/api/users/${editingUser.id}`, userForm, config);
       setShowUserModal(false);
       resetUserForm();
       fetchUsers();
@@ -222,7 +223,7 @@ const AdminPanel: React.FC = () => {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await axios.delete(`http://localhost:5028/api/users/${userId}`, config);
+          await axios.delete(`http://localhost:5000/api/users/${userId}`, config);
           fetchUsers();
           setModalAlert({ ...modalAlert, isOpen: false });
         } catch (error) {
@@ -268,7 +269,7 @@ const AdminPanel: React.FC = () => {
 
   const handleCreateFilm = async () => {
     try {
-      await axios.post('http://localhost:5028/api/films', filmForm, config);
+      await axios.post('http://localhost:5000/api/films', filmForm, config);
       setShowFilmModal(false);
       resetFilmForm();
       fetchFilms();
@@ -280,7 +281,7 @@ const AdminPanel: React.FC = () => {
   const handleUpdateFilm = async () => {
     if (!editingFilm) return;
     try {
-      await axios.put(`http://localhost:5028/api/films/${editingFilm.id}`, filmForm, config);
+      await axios.put(`http://localhost:5000/api/films/${editingFilm.id}`, filmForm, config);
       setShowFilmModal(false);
       resetFilmForm();
       fetchFilms();
@@ -297,7 +298,7 @@ const AdminPanel: React.FC = () => {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await axios.delete(`http://localhost:5028/api/films/${filmId}`, config);
+          await axios.delete(`http://localhost:5000/api/films/${filmId}`, config);
           fetchFilms();
           setModalAlert({ ...modalAlert, isOpen: false });
         } catch (error) {
@@ -371,7 +372,7 @@ const AdminPanel: React.FC = () => {
 
   const handleCreateCategory = async () => {
     try {
-      await axios.post('http://localhost:5028/api/categories', categoryForm, config);
+      await axios.post('http://localhost:5000/api/categories', categoryForm, config);
       setShowCategoryModal(false);
       resetCategoryForm();
       fetchCategories();
@@ -383,7 +384,7 @@ const AdminPanel: React.FC = () => {
   const handleUpdateCategory = async () => {
     if (!editingCategory) return;
     try {
-      await axios.put(`http://localhost:5028/api/categories/${editingCategory.id}`, categoryForm, config);
+      await axios.put(`http://localhost:5000/api/categories/${editingCategory.id}`, categoryForm, config);
       setShowCategoryModal(false);
       resetCategoryForm();
       fetchCategories();
@@ -400,7 +401,7 @@ const AdminPanel: React.FC = () => {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await axios.delete(`http://localhost:5028/api/categories/${categoryId}`, config);
+          await axios.delete(`http://localhost:5000/api/categories/${categoryId}`, config);
           fetchCategories();
           setModalAlert({ ...modalAlert, isOpen: false });
         } catch (error) {
@@ -438,7 +439,7 @@ const AdminPanel: React.FC = () => {
 
   const handleCreatePackage = async () => {
     try {
-      await axios.post('http://localhost:5028/api/packages', packageForm, config);
+      await axios.post('http://localhost:5000/api/packages', packageForm, config);
       setShowPackageModal(false);
       resetPackageForm();
       fetchPackages();
@@ -450,7 +451,7 @@ const AdminPanel: React.FC = () => {
   const handleUpdatePackage = async () => {
     if (!editingPackage) return;
     try {
-      await axios.put(`http://localhost:5028/api/packages/${editingPackage.id}`, packageForm, config);
+      await axios.put(`http://localhost:5000/api/packages/${editingPackage.id}`, packageForm, config);
       setShowPackageModal(false);
       resetPackageForm();
       fetchPackages();
@@ -467,7 +468,7 @@ const AdminPanel: React.FC = () => {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await axios.delete(`http://localhost:5028/api/packages/${packageId}`, config);
+          await axios.delete(`http://localhost:5000/api/packages/${packageId}`, config);
           fetchPackages();
           setModalAlert({ ...modalAlert, isOpen: false });
         } catch (error) {

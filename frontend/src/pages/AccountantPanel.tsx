@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../AuthContext';
 import ModalAlert from '../components/ModalAlert';
@@ -55,31 +55,31 @@ const AccountantPanel: React.FC = () => {
     headers: { Authorization: `Bearer ${token}` }
   };
 
-  useEffect(() => {
-    fetchOrders();
-    fetchFinancialReport();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5028/api/orders', config);
+      const response = await axios.get('http://localhost:5000/api/orders', config);
       setOrders(response.data.data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [config]);
 
-  const fetchFinancialReport = async () => {
+  const fetchFinancialReport = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5028/api/financial/report', config);
+      const response = await axios.get('http://localhost:5000/api/financial/report', config);
       setFinancialReport(response.data.data || null);
     } catch (error) {
       console.error('Error fetching financial report:', error);
     }
-  };
+  }, [config]);
+
+  useEffect(() => {
+    fetchOrders();
+    fetchFinancialReport();
+  }, [fetchOrders, fetchFinancialReport]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

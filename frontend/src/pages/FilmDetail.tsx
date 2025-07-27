@@ -31,6 +31,7 @@ const FilmDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchFilm();
   }, [id]);
@@ -38,7 +39,7 @@ const FilmDetail: React.FC = () => {
   const fetchFilm = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5028/api/films/${id}`);
+      const response = await axios.get(`http://localhost:5000/api/films/${id}`);
       setFilm(response.data.data);
     } catch (err) {
       setError('Film bilgileri yüklenirken bir hata oluştu');
@@ -56,7 +57,7 @@ const FilmDetail: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      await axios.post('http://localhost:5028/api/cart', {
+      await axios.post('http://localhost:5000/api/cart', {
         filmId: film?.id,
         quantity: 1
       }, config);
@@ -75,7 +76,7 @@ const FilmDetail: React.FC = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-      await axios.post('http://localhost:5028/api/userfilmlists', {
+      await axios.post('http://localhost:5000/api/userfilmlists', {
         filmId: film?.id
       }, config);
       // Listeye eklendi mesajı göstermek isterseniz burada ekleyebilirsiniz

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SDFilm.Business.Interfaces;
 using SDFilm.Core.DTOs;
@@ -18,9 +19,9 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.GetAllAsync();
+            var result = await _filmService.GetAllAsync(page, pageSize);
             return Ok(result);
         }
 
@@ -35,41 +36,45 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpGet("category/{categoryId}")]
-        public async Task<IActionResult> GetByCategory(int categoryId)
+        public async Task<IActionResult> GetByCategory(int categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.GetByCategoryAsync(categoryId);
+            var result = await _filmService.GetByCategoryAsync(categoryId, page, pageSize);
             return Ok(result);
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string q)
+        public async Task<IActionResult> Search([FromQuery] string q, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.SearchAsync(q);
+            if (string.IsNullOrWhiteSpace(q))
+                return BadRequest(ApiResponse<List<FilmDto>>.ErrorResult("Arama terimi boş olamaz"));
+
+            var result = await _filmService.SearchAsync(q, page, pageSize);
             return Ok(result);
         }
 
         [HttpGet("new-releases")]
-        public async Task<IActionResult> GetNewReleases()
+        public async Task<IActionResult> GetNewReleases([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.GetNewReleasesAsync();
+            var result = await _filmService.GetNewReleasesAsync(page, pageSize);
             return Ok(result);
         }
 
         [HttpGet("editor-choices")]
-        public async Task<IActionResult> GetEditorChoices()
+        public async Task<IActionResult> GetEditorChoices([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.GetEditorChoicesAsync();
+            var result = await _filmService.GetEditorChoicesAsync(page, pageSize);
             return Ok(result);
         }
 
         [HttpGet("most-rented")]
-        public async Task<IActionResult> GetMostRented()
+        public async Task<IActionResult> GetMostRented([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _filmService.GetMostRentedAsync();
+            var result = await _filmService.GetMostRentedAsync(page, pageSize);
             return Ok(result);
         }
 
         [HttpPost]
+        [Authorize(Policy = "FilmEntryPolicy")]
         public async Task<IActionResult> Create([FromBody] CreateFilmDto createFilmDto)
         {
             var result = await _filmService.CreateAsync(createFilmDto);
@@ -80,6 +85,7 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = "FilmEntryPolicy")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateFilmDto updateFilmDto)
         {
             var result = await _filmService.UpdateAsync(id, updateFilmDto);
@@ -90,6 +96,7 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "FilmEntryPolicy")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _filmService.DeleteAsync(id);
@@ -100,8 +107,12 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpPut("{id}/stock")]
+        [Authorize(Policy = "WarehousePolicy")]
         public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockDto updateStockDto)
         {
+            if (updateStockDto.NewStockCount < 0)
+                return BadRequest(ApiResponse<bool>.ErrorResult("Stok miktarı negatif olamaz"));
+
             var result = await _filmService.UpdateStockAsync(id, updateStockDto.NewStockCount);
             if (!result.Success)
                 return BadRequest(result);
@@ -110,8 +121,12 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpPost("add-stock")]
+        [Authorize(Policy = "WarehousePolicy")]
         public async Task<IActionResult> AddStock([FromBody] AddStockDto addStockDto)
         {
+            if (addStockDto.Quantity <= 0)
+                return BadRequest(ApiResponse<bool>.ErrorResult("Miktar pozitif olmalıdır"));
+
             var result = await _stockMovementService.CreateAsync(new CreateStockMovementDto
             {
                 FilmId = addStockDto.FilmId,
@@ -123,8 +138,12 @@ namespace SDFilm.API.Controllers
         }
 
         [HttpPost("remove-stock")]
+        [Authorize(Policy = "WarehousePolicy")]
         public async Task<IActionResult> RemoveStock([FromBody] RemoveStockDto removeStockDto)
         {
+            if (removeStockDto.Quantity <= 0)
+                return BadRequest(ApiResponse<bool>.ErrorResult("Miktar pozitif olmalıdır"));
+
             var result = await _stockMovementService.CreateAsync(new CreateStockMovementDto
             {
                 FilmId = removeStockDto.FilmId,
